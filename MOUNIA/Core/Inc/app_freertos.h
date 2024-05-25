@@ -1,8 +1,8 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    stm32u5xx_it.h
-  * @brief   This file contains the headers of the interrupt handlers.
+  * File Name          : app_freertos.h
+  * Description        : FreeRTOS applicative header file
   ******************************************************************************
   * @attention
   *
@@ -13,17 +13,22 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
- ******************************************************************************
+  ******************************************************************************
   */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32U5xx_IT_H
-#define __STM32U5xx_IT_H
+#ifndef __APP_FREERTOS_H__
+#define __APP_FREERTOS_H__
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+/* Includes ------------------------------------------------------------------*/
+#include "FreeRTOS.h"
+#include "task.h"
+#include "main.h"
+#include "cmsis_os2.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -40,27 +45,32 @@
 
 /* USER CODE END EC */
 
-/* Exported macro ------------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Exported macro -------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
+extern osThreadId_t defaultTaskHandle;
 
-/* Exported functions prototypes ---------------------------------------------*/
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void DebugMon_Handler(void);
-void TIM6_IRQHandler(void);
-void USART3_IRQHandler(void);
-void GPDMA1_Channel11_IRQHandler(void);
-/* USER CODE BEGIN EFP */
+/* Exported function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN FunctionPrototypes */
 
-/* USER CODE END EFP */
+/* USER CODE END FunctionPrototypes */
+
+void StartDefaultTask(void *argument);
+
+void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* Private application code --------------------------------------------------*/
+/* USER CODE BEGIN Application */
+
+/* USER CODE END Application */
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* __STM32U5xx_IT_H */
+#endif /* __APP_FREERTOS_H__ */

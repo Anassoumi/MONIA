@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os2.h"
 #include "dcache.h"
 #include "gpdma.h"
 #include "i2c.h"
@@ -27,8 +28,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "../App/Modules/Inc/bme.hpp"
-#include "../App/Modules/Inc/tcs34.hpp"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,6 +54,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 int _write(int file, char *ptr, int len)
@@ -118,16 +119,27 @@ int main(void)
   GPS_entry();
   /* USER CODE END 2 */
 
+  /* Init scheduler */
+//  osKernelInitialize();
+
+  /* Call init function for freertos objects (in cmsis_os2.c) */
+  MX_FREERTOS_Init();
+
+  /* Start scheduler */
+//  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  vTaskStartScheduler();
   while (1)
   {
 
 
 
 
-	  BME_entry();
-	  entry_TC34();
+
 
 
 
@@ -139,34 +151,6 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-
-
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-    uint32_t error = HAL_UART_GetError(huart);
-    if (error & HAL_UART_ERROR_FE)
-    {
-        // Overrun error occurred
-        __HAL_UART_CLEAR_OREFLAG(huart);  // Clear the overrun flag
-
-        // Reset DMA for reception to clear any corrupted data states
-        HAL_UART_AbortReceive(huart);  // Abort current receive
-        HAL_UART_Receive_DMA(huart, gps_buffer, sizeof(gps_buffer));  // Restart reception
-
-        // Log or handle the overrun error as needed
-        // For example: send error message to debug console or increment an error counter
-    }
-}
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//  if(huart->Instance == USART3) // Check if the interrupt is for USART3
-//  {
-//    // Optionally process data here or set a flag to process in main loop
-//
-//    // Re-arm the DMA reception for continuous data reception
-//    HAL_UART_Receive_DMA(huart, gps_buffer, sizeof(gps_buffer));
-//  }
-//}
 
 /**
   * @brief System Clock Configuration
@@ -230,6 +214,27 @@ void SystemClock_Config(void)
 
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM6 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM6) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
